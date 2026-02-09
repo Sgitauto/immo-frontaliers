@@ -1,0 +1,39 @@
+name: Scrape Immo Daily
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Tous les jours à 8h UTC (9h CET)
+  workflow_dispatch:  # Permet de lancer manuellement
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Create data directory
+        run: mkdir -p data
+      
+      - name: Run scraper
+        run: python scraper.py
+      
+      - name: Commit and push changes
+        run: |
+          git config user.name "Immo Bot"
+          git config user.email "bot@immo-frontaliers.com"
+          git add data/properties.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update properties $(date +'%Y-%m-%d %H:%M')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
