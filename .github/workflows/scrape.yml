@@ -5,6 +5,9 @@ on:
     - cron: '0 8 * * *'  # Tous les jours à 8h UTC (9h CET)
   workflow_dispatch:  # Permet de lancer manuellement
 
+  permissions:
+  contents: write
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
